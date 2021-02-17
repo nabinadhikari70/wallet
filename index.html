@@ -27,14 +27,14 @@
     </div>
 
     <div class="container" style="margin-top: 70px">
-      <div id="walletActionButtons" class="card">
+      <div id="loading"></div>
+      <div id="walletActionButtons" class="card" style="display: none">
         <div class="card-body">
           <button
             type="button"
             id="btnCreateWallet"
             class="btn btn-block btn-primary"
-            data-toggle="modal"
-            data-target="#mdlPasscode"
+            onclick="togglePasscodeModal()"
           >
             <ion-icon name="add-outline"></ion-icon> Create Wallet
           </button>
@@ -42,8 +42,7 @@
             type="button"
             id="btnRestoreWallet"
             class="btn btn-block btn-success"
-            data-toggle="modal"
-            data-target="#mdlMnemonicRestore"
+            onclick="toggleMnemonicRestoreModal()"
           >
             <ion-icon name="wallet-outline"></ion-icon>
             Restore Wallet
@@ -51,65 +50,68 @@
         </div>
       </div>
 
-      <div id="walletSection" class="card card-box">
-        <div class="card-body">
-          <p>
-            Wallet Address :
-            <strong>0xCD26403424B196e64e659fBe0942A226A3DFE656</strong>
-          </p>
-          <p>Balance : <strong>0.0</strong></p>
-        </div>
-      </div>
-      <div id="transferSection" class="card card-box">
-        <div class="card-body">
-          <p>Transfer Token</p>
-          <div class="form-group">
-            <input
-              type="text"
-              placeholder="Enter receiver wallet address"
-              name="inputSendToAddress"
-              id="inputSendToAddress"
-              class="form-control"
-            />
-          </div>
-          <div class="form-group">
-            <input
-              placeholder="Enter token amount"
-              type="number"
-              name="inputAmount"
-              id="inputAmount"
-              class="form-control"
-            />
-          </div>
-          <div class="form-group">
-            <button type="button" id="btnSendToken" class="btn btn-primary">
-              <ion-icon name="send-outline"></ion-icon>
-              Send Token
-            </button>
+      <div id="hasWallet" style="display: none">
+        <div id="walletSection" class="card card-box">
+          <div class="card-body">
+            <p>
+              Wallet Address :
+              <strong>0xCD26403424B196e64e659fBe0942A226A3DFE656</strong>
+            </p>
+            <p>Balance : <strong>0.0</strong></p>
           </div>
         </div>
-      </div>
 
-      <div id="networkSection" class="card card-box">
-        <div class="card-body">
-          <p>Network Settings</p>
-          <div class="form-check">
-            <label class="form-check-label">
+        <div id="transferSection" class="card card-box">
+          <div class="card-body">
+            <p>Transfer Token</p>
+            <div class="form-group">
               <input
-                type="radio"
-                class="form-check-input"
-                name="optradio"
-              />Rinkby Network
-            </label>
+                type="text"
+                placeholder="Enter receiver wallet address"
+                name="inputSendToAddress"
+                id="inputSendToAddress"
+                class="form-control"
+              />
+            </div>
+            <div class="form-group">
+              <input
+                placeholder="Enter token amount"
+                type="number"
+                name="inputAmount"
+                id="inputAmount"
+                class="form-control"
+              />
+            </div>
+            <div class="form-group">
+              <button type="button" id="btnSendToken" class="btn btn-primary">
+                <ion-icon name="send-outline"></ion-icon>
+                Send Token
+              </button>
+            </div>
           </div>
-          <div class="form-check">
-            <label class="form-check-label">
-              <input
-                type="radio"
-                class="form-check-input"
-                name="optradio"
-              />Ethereum Network
-            </label>
+        </div>
+
+        <div id="networkSection" class="card card-box">
+          <div class="card-body">
+            <p>Network Settings</p>
+            <div class="form-check">
+              <label class="form-check-label">
+                <input
+                  type="radio"
+                  class="form-check-input"
+                  name="optradio"
+                />Rinkby Network
+              </label>
+            </div>
+            <div class="form-check">
+              <label class="form-check-label">
+                <input
+                  type="radio"
+                  class="form-check-input"
+                  name="optradio"
+                />Ethereum Network
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -142,7 +144,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="form-group">
+        <div class="form-group" id="passcodeComp">
           <label>Enter 6-digit Passcode</label>
           <input
             type="text"
@@ -150,11 +152,11 @@
             maxlength="6"
             id="inputPasscode"
             name="inputPasscode"
-            class="form-control"
             onkeypress="return isNumberKey(event)"
+            class="form-control"
           />
         </div>
-        <div class="form-group" style="display: none">
+        <div class="form-group" id="confirmPasscodeComp" style="display: none">
           <label>Please re-enter your passcode</label>
           <input
             type="text"
