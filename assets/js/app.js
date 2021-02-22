@@ -26,14 +26,25 @@ $(document).ready(function () {
     }
   });
 
+  $('#inputVerifyPasscode').on('input', function (e) {
+    const { value } = e.target;
+    if (value.length === 6) {
+      passcode = value;
+      toggleCheckPasscodeModal();
+      toggleMnemonicRestoreModal();
+    }
+  });
+
   $('#btnSubmitMnemonic').on('click', function () {
-    console.log('Hey');
     const phrase = $('#inputMnemonic').val();
     if (phrase.length < 10) {
       alert('Please enter your 12 word phrase');
       return;
     }
-    console.log('SUBMIT');
+    toggleMnemonicRestoreModal();
+    $('#loading').html('Restoring your wallet. Please wait...');
+    $('#walletActionButtons').hide();
+    return createWallet(passcode, phrase);
   });
 });
 
@@ -74,9 +85,9 @@ const createWallet = async (passcode, mnemonic) => {
   }
 };
 
-const checkPasscodeModal = () => {
+const toggleCheckPasscodeModal = () => {
   resetPasscodeFields();
-  $().modal('toggle');
+  $('#mdlCheckPasscode').modal('toggle');
 };
 
 const togglePasscodeModal = () => {
@@ -87,49 +98,3 @@ const togglePasscodeModal = () => {
 const toggleMnemonicRestoreModal = () => {
   $('#mdlMnemonicRestore').modal('toggle');
 };
-
-const resetPasscodeFields = () => {
-  $('#inputPasscode').val('');
-  $('#inputConfirmPasscode').val('');
-};
-
-// =========== Local Storage ===========
-const saveMnemonic = (mnemonic) => {
-  localStorage.setItem('mnemonic', mnemonic);
-};
-
-const getMnemonic = () => {
-  return localStorage.getItem('mnemonic');
-};
-
-const saveEncryptedWallet = (wallet) => {
-  localStorage.setItem('encWallet', wallet);
-};
-
-const getEncryptedWallet = () => {
-  return localStorage.getItem('encWallet');
-};
-
-const savePrivateKey = (privateKey) => {
-  localStorage.setItem('privateKey', privateKey);
-};
-
-const getPrivatekey = () => {
-  return localStorage.getItem('privateKey');
-};
-
-const saveAddress = (address) => {
-  localStorage.setItem('address', address);
-};
-
-const getAddress = () => {
-  return localStorage.getItem('address');
-};
-// ===========END Local Storage ===========
-
-function isNumberKey(evt) {
-  var charCode = evt.which ? evt.which : evt.keyCode;
-  if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57))
-    return false;
-  return true;
-}

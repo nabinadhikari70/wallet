@@ -1,5 +1,3 @@
 Fetch Balance
-Restore wallet using mnemonic
-  0xef502b3B8c0A96b3D6BE0DE25dDA6E5C9259bfA4
 Transfer ether
 Change Network
