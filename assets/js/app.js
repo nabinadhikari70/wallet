@@ -15,7 +15,6 @@ $(document).ready(function () {
 
   $('#inputConfirmPasscode').on('input', function (e) {
     const { value } = e.target;
-    console.log({ value });
     if (value.length === 6) {
       if (value === passcode) {
         $('#loading').html('Creating your wallet. Please wait...');
@@ -26,15 +25,29 @@ $(document).ready(function () {
       alert('Please type correct passcode!');
     }
   });
+
+  $('#btnSubmitMnemonic').on('click', function () {
+    console.log('Hey');
+    const phrase = $('#inputMnemonic').val();
+    if (phrase.length < 10) {
+      alert('Please enter your 12 word phrase');
+      return;
+    }
+    console.log('SUBMIT');
+  });
 });
 
 // ====================
 const loadWallet = async () => {
-  let wallet = getEncryptedWallet();
-  if (wallet) {
-    $('#walletActionButtons').removeAttr('style');
-  } else {
+  const wallet = getEncryptedWallet();
+  const address = getAddress();
+  const mnemonic = getMnemonic();
+  if (wallet && address) {
     $('#hasWallet').removeAttr('style');
+    $('#walletAddress').html(address);
+    $('#mnemonicPhrase').html(mnemonic);
+  } else {
+    $('#walletActionButtons').removeAttr('style');
   }
 };
 
@@ -48,14 +61,22 @@ const createWallet = async (passcode, mnemonic) => {
     if (mnemonic) wallet = ethers.Wallet.fromMnemonic(mnemonic);
     else wallet = ethers.Wallet.createRandom();
     const { address, privateKey } = wallet;
+    const { phrase } = wallet.mnemonic;
     const encryptedWallet = await wallet.encrypt(passcode.toString());
+    saveMnemonic(phrase);
     saveEncryptedWallet(encryptedWallet);
     saveAddress(address);
     savePrivateKey(privateKey);
     window.location.reload();
   } catch (err) {
     console.log('ERR==>', err);
+    alert('Invalid wallet info');
   }
+};
+
+const checkPasscodeModal = () => {
+  resetPasscodeFields();
+  $().modal('toggle');
 };
 
 const togglePasscodeModal = () => {
@@ -73,12 +94,20 @@ const resetPasscodeFields = () => {
 };
 
 // =========== Local Storage ===========
+const saveMnemonic = (mnemonic) => {
+  localStorage.setItem('mnemonic', mnemonic);
+};
+
+const getMnemonic = () => {
+  return localStorage.getItem('mnemonic');
+};
+
 const saveEncryptedWallet = (wallet) => {
   localStorage.setItem('encWallet', wallet);
 };
 
 const getEncryptedWallet = () => {
-  localStorage.getItem('encWallet');
+  return localStorage.getItem('encWallet');
 };
 
 const savePrivateKey = (privateKey) => {
@@ -86,7 +115,7 @@ const savePrivateKey = (privateKey) => {
 };
 
 const getPrivatekey = () => {
-  localStorage.getItem('privateKey');
+  return localStorage.getItem('privateKey');
 };
 
 const saveAddress = (address) => {
@@ -94,7 +123,7 @@ const saveAddress = (address) => {
 };
 
 const getAddress = () => {
-  localStorage.getItem('address');
+  return localStorage.getItem('address');
 };
 // ===========END Local Storage ===========
 
