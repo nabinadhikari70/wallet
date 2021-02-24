@@ -1,3 +1,1 @@
-Fetch Balance
 Transfer ether
-Change Network

@@ -2,6 +2,11 @@ $(document).ready(function () {
   let passcode;
   loadWallet();
 
+  $('input[type=radio][name=network]').change(function () {
+    saveCurrentNetwork(this.value);
+    window.location.reload();
+  });
+
   $('#inputPasscode').on('input', function (e) {
     const { value } = e.target;
     if (value.length === 6) {
@@ -54,12 +59,28 @@ const loadWallet = async () => {
   const address = getAddress();
   const mnemonic = getMnemonic();
   if (wallet && address) {
+    fetchBalance(address);
     $('#hasWallet').removeAttr('style');
     $('#walletAddress').html(address);
     $('#mnemonicPhrase').html(mnemonic);
   } else {
     $('#walletActionButtons').removeAttr('style');
   }
+};
+
+const fetchBalance = (address) => {
+  const network = getNetworkByName();
+  const { url } = network;
+  const provider = new ethers.providers.JsonRpcProvider(url);
+  provider
+    .getBalance(address)
+    .then((balance) => {
+      const myBalance = ethers.utils.formatEther(balance);
+      $('#myBalance').html(myBalance);
+    })
+    .catch((err) => {
+      console.log('ERR:', err);
+    });
 };
 
 const createWallet = async (passcode, mnemonic) => {
@@ -83,6 +104,39 @@ const createWallet = async (passcode, mnemonic) => {
     console.log('ERR==>', err);
     alert('Invalid wallet info');
   }
+};
+
+const sendEther = async () => {
+  try {
+    const sendToAddress = $('#inputSendToAddress').val();
+    const sendAmount = $('#inputAmount').val();
+    if (!sendAmount || !sendToAddress)
+      return alert('Recepient address and amount is required!');
+
+    $('#sendEther').html('Sending ether, please wait....');
+    const wallet = await loadFromPrivateKey();
+    const receipt = await wallet.sendTransaction({
+      to: sendToAddress,
+      value: ethers.utils.parseEther(sendAmount.toString()),
+    });
+    console.log('RECEIPT==>', receipt);
+    alert(`${sendAmount} ethers sent to an address ${sendToAddress}`);
+    window.location.reload();
+  } catch (err) {
+    console.log('ERR:', err);
+  }
+};
+
+const loadFromPrivateKey = async () => {
+  const privateKey = getPrivatekey();
+  if (!privateKey) return null;
+  let wallet = await new ethers.Wallet(privateKey);
+  if (!wallet) throw Error('Wallet not found');
+  const network = getNetworkByName();
+  const { url } = network;
+  const provider = new ethers.providers.JsonRpcProvider(url);
+  wallet = wallet.connect(provider);
+  return wallet;
 };
 
 const toggleCheckPasscodeModal = () => {

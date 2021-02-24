@@ -30,6 +30,14 @@ const getAddress = () => {
   return localStorage.getItem('address');
 };
 
+const saveCurrentNetwork = (network) => {
+  localStorage.setItem('currentNetwork', network);
+};
+
+const getCurrentNetwork = () => {
+  return localStorage.getItem('currentNetwork');
+};
+
 const resetPasscodeFields = () => {
   $('#inputPasscode').val('');
   $('#inputConfirmPasscode').val('');
@@ -43,3 +51,33 @@ function isNumberKey(evt) {
     return false;
   return true;
 }
+
+const networks = [
+  {
+    name: 'rumsan',
+    url: 'https://testnetwork.esatya.io',
+    display: 'Rumsan Network',
+    default: true,
+  },
+  {
+    name: 'mainnet',
+    url: 'https://mainnet.infura.io/v3/ae22018377b14a61983be979df457b20',
+    display: 'Mainnet (Ethereum)',
+  },
+  {
+    name: 'rinkeby',
+    url: 'https://rinkeby.infura.io/v3/ae22018377b14a61983be979df457b20',
+    display: 'Rinkeby',
+  },
+];
+
+const getDefaultNetwork = () => {
+  return networks.find((d) => d.default);
+};
+
+const getNetworkByName = () => {
+  const name = getCurrentNetwork();
+  console.log({ name });
+  if (!name) return getDefaultNetwork();
+  return networks.find((d) => d.name === name);
+};
