@@ -38,6 +38,11 @@ const getCurrentNetwork = () => {
   return localStorage.getItem('currentNetwork');
 };
 
+const resetSendForm = () => {
+  $('#inputSendToAddress').val('');
+  $('#inputAmount').val('');
+};
+
 const resetPasscodeFields = () => {
   $('#inputPasscode').val('');
   $('#inputConfirmPasscode').val('');
@@ -77,7 +82,6 @@ const getDefaultNetwork = () => {
 
 const getNetworkByName = () => {
   const name = getCurrentNetwork();
-  console.log({ name });
   if (!name) return getDefaultNetwork();
   return networks.find((d) => d.name === name);
 };

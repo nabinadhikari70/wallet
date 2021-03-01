@@ -1,5 +1,6 @@
 $(document).ready(function () {
   let passcode;
+  resetSendForm();
   loadWallet();
 
   $('input[type=radio][name=network]').change(function () {
@@ -70,7 +71,8 @@ const loadWallet = async () => {
 
 const fetchBalance = (address) => {
   const network = getNetworkByName();
-  const { url } = network;
+  const { url, name } = network;
+  $('#' + name).attr('checked', true);
   const provider = new ethers.providers.JsonRpcProvider(url);
   provider
     .getBalance(address)
@@ -115,15 +117,17 @@ const sendEther = async () => {
 
     $('#sendEther').html('Sending ether, please wait....');
     const wallet = await loadFromPrivateKey();
-    const receipt = await wallet.sendTransaction({
+    await wallet.sendTransaction({
       to: sendToAddress,
       value: ethers.utils.parseEther(sendAmount.toString()),
     });
-    console.log('RECEIPT==>', receipt);
+    resetSendForm();
     alert(`${sendAmount} ethers sent to an address ${sendToAddress}`);
     window.location.reload();
   } catch (err) {
-    console.log('ERR:', err);
+    console.log('ERR:==>', err);
+    alert('OOPS!, Transaction failed!');
+    window.location.reload();
   }
 };
 
