@@ -60,7 +60,7 @@ function isNumberKey(evt) {
 const networks = [
   {
     name: 'rumsan',
-    url: 'https://testnetwork.esatya.io',
+    url: 'http://172.110.7.136:8548',
     display: 'Rumsan Network',
     default: true,
   },
@@ -80,8 +80,7 @@ const getDefaultNetwork = () => {
   return networks.find((d) => d.default);
 };
 
-const getNetworkByName = () => {
-  const name = getCurrentNetwork();
+const getNetworkByName = (name) => {
   if (!name) return getDefaultNetwork();
   return networks.find((d) => d.name === name);
 };

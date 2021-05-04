@@ -56,21 +56,39 @@ $(document).ready(function () {
 
 // ====================
 const loadWallet = async () => {
+  // Write code
   const wallet = getEncryptedWallet();
   const address = getAddress();
   const mnemonic = getMnemonic();
   if (wallet && address) {
     fetchBalance(address);
-    $('#hasWallet').removeAttr('style');
     $('#walletAddress').html(address);
     $('#mnemonicPhrase').html(mnemonic);
+    $('#hasWallet').removeAttr('style');
   } else {
     $('#walletActionButtons').removeAttr('style');
   }
 };
 
+const createWallet = async (passcode, mnemonic) => {
+  // Write code
+  let wallet = getEncryptedWallet();
+  if (wallet) return { wallet: null, encryptedWallet: wallet };
+  if (mnemonic) wallet = ethers.Wallet.fromMnemonic(mnemonic);
+  else wallet = ethers.Wallet.createRandom();
+  const { address, privateKey } = wallet;
+  const { phrase } = wallet.mnemonic;
+  const encWallet = await wallet.encrypt(passcode.toString());
+  saveEncryptedWallet(encWallet);
+  savePrivateKey(privateKey);
+  saveAddress(address);
+  saveMnemonic(phrase);
+  window.location.reload();
+};
+
 const fetchBalance = (address) => {
-  const network = getNetworkByName();
+  const currentNetwork = getCurrentNetwork();
+  const network = getNetworkByName(currentNetwork);
   const { url, name } = network;
   $('#' + name).attr('checked', true);
   const provider = new ethers.providers.JsonRpcProvider(url);
@@ -78,62 +96,39 @@ const fetchBalance = (address) => {
     .getBalance(address)
     .then((balance) => {
       const myBalance = ethers.utils.formatEther(balance);
+      console.log(myBalance);
       $('#myBalance').html(myBalance);
     })
     .catch((err) => {
-      console.log('ERR:', err);
+      console.log('ERR=>', err);
     });
 };
 
-const createWallet = async (passcode, mnemonic) => {
-  try {
-    if (!passcode) {
-      throw Error('Passcode must be set first');
-    }
-    let wallet = getEncryptedWallet();
-    if (wallet) return { wallet: null, encryptedWallet: wallet };
-    if (mnemonic) wallet = ethers.Wallet.fromMnemonic(mnemonic);
-    else wallet = ethers.Wallet.createRandom();
-    const { address, privateKey } = wallet;
-    const { phrase } = wallet.mnemonic;
-    const encryptedWallet = await wallet.encrypt(passcode.toString());
-    saveMnemonic(phrase);
-    saveEncryptedWallet(encryptedWallet);
-    saveAddress(address);
-    savePrivateKey(privateKey);
-    window.location.reload();
-  } catch (err) {
-    console.log('ERR==>', err);
-    alert('Invalid wallet info');
-  }
-};
-
 const sendEther = async () => {
+  // Write code
   try {
     const sendToAddress = $('#inputSendToAddress').val();
     const sendAmount = $('#inputAmount').val();
-    if (!sendAmount || !sendToAddress)
-      return alert('Recepient address and amount is required!');
+    if (!sendToAddress || !sendAmount)
+      return alert('Please enter recepient address and amount!');
 
-    $('#sendEther').html('Sending ether, please wait....');
+    $('#sendEther').html('Sending ether, please wait...');
     const wallet = await loadFromPrivateKey();
     await wallet.sendTransaction({
       to: sendToAddress,
       value: ethers.utils.parseEther(sendAmount.toString()),
     });
     resetSendForm();
-    alert(`${sendAmount} ethers sent to an address ${sendToAddress}`);
+    alert(`${sendAmount} ETH sent to an address ${sendToAddress}`);
     window.location.reload();
   } catch (err) {
-    console.log('ERR:==>', err);
-    alert('OOPS!, Transaction failed!');
-    window.location.reload();
+    console.log('ERR==>', err);
   }
 };
 
 const loadFromPrivateKey = async () => {
+  // Write code
   const privateKey = getPrivatekey();
-  if (!privateKey) return null;
   let wallet = await new ethers.Wallet(privateKey);
   if (!wallet) throw Error('Wallet not found');
   const network = getNetworkByName();

@@ -1,1 +1,5 @@
+Create wallet
+Fetch balance
 Transfer ether
+Restore using mnemonic
+Change blockchain network
