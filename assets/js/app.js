@@ -3,36 +3,36 @@ $(document).ready(function () {
   resetSendForm();
   loadWallet();
 
-  $('input[type=radio][name=network]').change(function () {
+  $("input[type=radio][name=network]").change(function () {
     saveCurrentNetwork(this.value);
     window.location.reload();
   });
 
-  $('#inputPasscode').on('input', function (e) {
+  $("#inputPasscode").on("input", function (e) {
     const { value } = e.target;
     if (value.length === 6) {
       passcode = value;
       resetPasscodeFields();
-      $('#passcodeComp').hide();
-      $('#confirmPasscodeComp').removeAttr('style');
-      $('#inputConfirmPasscode').focus();
+      $("#passcodeComp").hide();
+      $("#confirmPasscodeComp").removeAttr("style");
+      $("#inputConfirmPasscode").focus();
     }
   });
 
-  $('#inputConfirmPasscode').on('input', function (e) {
+  $("#inputConfirmPasscode").on("input", function (e) {
     const { value } = e.target;
     if (value.length === 6) {
       if (value === passcode) {
-        $('#loading').html('Creating your wallet. Please wait...');
-        $('#walletActionButtons').hide();
+        $("#loading").html("Creating your wallet. Please wait...");
+        $("#walletActionButtons").hide();
         togglePasscodeModal();
         return createWallet(value);
       }
-      alert('Please type correct passcode!');
+      alert("Please type correct passcode!");
     }
   });
 
-  $('#inputVerifyPasscode').on('input', function (e) {
+  $("#inputVerifyPasscode").on("input", function (e) {
     const { value } = e.target;
     if (value.length === 6) {
       passcode = value;
@@ -41,15 +41,15 @@ $(document).ready(function () {
     }
   });
 
-  $('#btnSubmitMnemonic').on('click', function () {
-    const phrase = $('#inputMnemonic').val();
+  $("#btnSubmitMnemonic").on("click", function () {
+    const phrase = $("#inputMnemonic").val();
     if (phrase.length < 10) {
-      alert('Please enter your 12 word phrase');
+      alert("Please enter your 12 word phrase");
       return;
     }
     toggleMnemonicRestoreModal();
-    $('#loading').html('Restoring your wallet. Please wait...');
-    $('#walletActionButtons').hide();
+    $("#loading").html("Restoring your wallet. Please wait...");
+    $("#walletActionButtons").hide();
     return createWallet(passcode, phrase);
   });
 });
@@ -62,11 +62,11 @@ const loadWallet = async () => {
   const mnemonic = getMnemonic();
   if (wallet && address) {
     fetchBalance(address);
-    $('#walletAddress').html(address);
-    $('#mnemonicPhrase').html(mnemonic);
-    $('#hasWallet').removeAttr('style');
+    $("#walletAddress").html(address);
+    $("#mnemonicPhrase").html(mnemonic);
+    $("#hasWallet").removeAttr("style");
   } else {
-    $('#walletActionButtons').removeAttr('style');
+    $("#walletActionButtons").removeAttr("style");
   }
 };
 
@@ -90,29 +90,29 @@ const fetchBalance = (address) => {
   const currentNetwork = getCurrentNetwork();
   const network = getNetworkByName(currentNetwork);
   const { url, name } = network;
-  $('#' + name).attr('checked', true);
+  $("#" + name).attr("checked", true);
   const provider = new ethers.providers.JsonRpcProvider(url);
   provider
     .getBalance(address)
     .then((balance) => {
       const myBalance = ethers.utils.formatEther(balance);
       console.log(myBalance);
-      $('#myBalance').html(myBalance);
+      $("#myBalance").html(myBalance);
     })
     .catch((err) => {
-      console.log('ERR=>', err);
+      console.log("ERR=>", err);
     });
 };
 
 const sendEther = async () => {
   // Write code
   try {
-    const sendToAddress = $('#inputSendToAddress').val();
-    const sendAmount = $('#inputAmount').val();
+    const sendToAddress = $("#inputSendToAddress").val();
+    const sendAmount = $("#inputAmount").val();
     if (!sendToAddress || !sendAmount)
-      return alert('Please enter recepient address and amount!');
+      return alert("Please enter recepient address and amount!");
 
-    $('#sendEther').html('Sending ether, please wait...');
+    $("#sendEther").html("Sending ether, please wait...");
     const wallet = await loadFromPrivateKey();
     await wallet.sendTransaction({
       to: sendToAddress,
@@ -122,7 +122,7 @@ const sendEther = async () => {
     alert(`${sendAmount} ETH sent to an address ${sendToAddress}`);
     window.location.reload();
   } catch (err) {
-    console.log('ERR==>', err);
+    console.log("ERR==>", err);
   }
 };
 
@@ -130,7 +130,7 @@ const loadFromPrivateKey = async () => {
   // Write code
   const privateKey = getPrivatekey();
   let wallet = await new ethers.Wallet(privateKey);
-  if (!wallet) throw Error('Wallet not found');
+  if (!wallet) throw Error("Wallet not found");
   const network = getNetworkByName();
   const { url } = network;
   const provider = new ethers.providers.JsonRpcProvider(url);
@@ -138,16 +138,23 @@ const loadFromPrivateKey = async () => {
   return wallet;
 };
 
+const signMessage = async () => {
+  const wallet = await loadFromPrivateKey();
+  const message = $("#inputMsg").val();
+  const sign = await wallet.signMessage(message);
+  $("#signedMessage").text(sign);
+};
+
 const toggleCheckPasscodeModal = () => {
   resetPasscodeFields();
-  $('#mdlCheckPasscode').modal('toggle');
+  $("#mdlCheckPasscode").modal("toggle");
 };
 
 const togglePasscodeModal = () => {
   resetPasscodeFields();
-  $('#mdlPasscode').modal('toggle');
+  $("#mdlPasscode").modal("toggle");
 };
 
 const toggleMnemonicRestoreModal = () => {
-  $('#mdlMnemonicRestore').modal('toggle');
+  $("#mdlMnemonicRestore").modal("toggle");
 };

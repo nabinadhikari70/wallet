@@ -101,6 +101,25 @@
           </div>
         </div>
       </div>
+      <div id="signatureSection" class="card card-box">
+        <div class="card-body">
+          <p>Sign Message</p>
+          <div class="form-group">
+            <label>Enter Your Message to sign</label>
+            <textarea class="form-control" id="inputMsg" rows="5"></textarea>
+          </div>
+          <div class="form-group">
+            <button onclick="signMessage()" id="btnSignMessage" type="button" class="btn btn-primary">
+              Sign
+            </button>
+          </div>
+          <p>
+            Signature: <strong><span id="signedMessage"></span></strong>
+          </p>
+        </div>
+      </div>
+
+
     </div>
   </div>
 
